@@ -1,5 +1,5 @@
 from webapp import app
-from flask import render_template, send_from_directory, request, url_for, redirect
+from flask import render_template, send_from_directory, request, url_for, redirect, flash
 import requests as r
 
 @app.route('/')
@@ -28,7 +28,8 @@ def login():
         response.set_cookie('session', value=session.cookies["session"])
         return response
     elif resp.status_code == 400:
-        return "login failed >:)"
+        flash("Login failed")
+        return redirect(url_for('index'))
 
 @app.route('/logout/')
 def logout():
@@ -38,6 +39,7 @@ def logout():
 
 @app.route('/res/<path:path>')
 def send_css(path):
+    a = 0
     return send_from_directory('resources', path)
 
 def call_api(url):

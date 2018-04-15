@@ -1,5 +1,6 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}Login{% endblock %}
+{% import "bootstrap/utils.html" as utils %}
 
 {% block styles %}
 {{super()}}
@@ -9,6 +10,15 @@
 
 {% block content %}
 <div class="container">
+    {%- with messages = get_flashed_messages(with_categories=True) %}
+    {%- if messages %}
+        <div class="row">
+            <div class="col-md-12">
+                {{utils.flashed_messages(messages)}}
+            </div>
+        </div>
+    {%- endif %}
+    {%- endwith %}
     <div class="login-container">
             <div id="output"></div>
             <div class="avatar"></div>
