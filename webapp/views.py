@@ -7,9 +7,11 @@ def index():
     if 'session' in request.cookies:
         roles = call_api('whoami')["roles"]
         if "Administrator" in roles:
-            return render_template('admin/index.tpl')
+            appointments = call_api("admin/appointments")
+            return render_template('admin/index.tpl', appointments=appointments)
         elif "Mechanic" in roles:
-            return render_template('mechanic/index.tpl')
+            appointments = call_api("mechanic/appointments")
+            return render_template('mechanic/index.tpl', appointments=appointments)
     return render_template('login.tpl')
 
 @app.route('/login/', methods=["POST"])
