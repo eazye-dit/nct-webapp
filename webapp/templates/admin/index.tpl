@@ -1,6 +1,13 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}Index{% endblock %}
 
+
+
+#d1{
+	float:left
+}
+
+
 {% block styles %}
 {{super()}}
 <link rel="stylesheet"
@@ -31,13 +38,17 @@
         </div>
       </div>
 
-      <div class="inner cover">
-        <h1 class="cover-heading">Welcome >:)</h1>
+      <div class="inner cover" style="border: 1px groove black" id="d1" > 
+		{% for appointment in appointments["appointments"] %}
+		
+		<p> {{ appointment["assigned"]["last"], appointment["date"], appointment["vehicle"]["registration"] }} </p> 
 
-        <p class="lead">Cool stats here I guess</p>
-        <p class="lead"><a class="btn btn-lg btn-info" href="#">Learn
-        more</a></p>
+		
+		{% endfor%}
       </div>
+	  
+	  
+	  
     </div>
 </div>
 </div>
