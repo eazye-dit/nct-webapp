@@ -3,11 +3,6 @@
 
 
 
-#d1{
-	float:left
-}
-
-
 {% block styles %}
 {{super()}}
 <link rel="stylesheet"
@@ -37,8 +32,15 @@
           </ul>
         </div>
       </div>
+	  
+	  <div class="subhead">
+	  
+	  <button align="left">Appointments</button>
+	  <button align="right">Mechanics</button>
+	  
+	  </div>
 
-      <div class="inner cover" style="border: 1px groove black" id="d1" > 
+      <div class="inner cover" style="border: 1px groove black"> 
 		{% for appointment in appointments["appointments"] %}
 		
 		<p> {{ appointment["assigned"]["last"], appointment["date"], appointment["vehicle"]["registration"] }} </p> 
@@ -46,6 +48,8 @@
 		
 		{% endfor%}
       </div>
+	  
+	  
 	  
 	  
 	  
