@@ -1,45 +1,58 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}Appointments{% endblock %}
 
-
-
-{% block styles %}
-{{super()}}
-<link rel="stylesheet"
-      href="/res/css/cover.css">
-<link rel="stylesheet"
-      href="/res/css/style.css">
-{% endblock %}
-
 {% block content %}
-<div class="site-wrapper">
-  <div class="site-wrapper-inner">
-    <div class="cover-container">
-      <div class="masthead clearfix">
-        <div class="inner">
-          <h3 class="masthead-brand">Admin</h3>
-
-          <ul class="nav masthead-nav">
-            <li class="active">
-              <a href="/">Appointments</a>
-            </li>
-
-            <li>
-              <a href="/logout">Logout</a>
-            </li>
-
-          </ul>
-        </div>
-      </div>
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">NCT</a>
     </div>
-  <div class="container">
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
+        <li><a href="#">Appointments</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New... <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Appointment</a></li>
+            <li><a href="#">Mechanc</a></li>
+          </ul>
+        </li>
+      </ul>
+      <form class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Controls <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
     <div class="row">
     {% for appointment in appointments["appointments"] %}
-        <div class="col-sm-4" style="border: 1px solid #ddd;">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ appointment["vehicle"]["registration"] }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ appointment["date"] }}</h6>
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                 <div class="panel-heading">
+                    <h3 class="panel-title">{{ appointment["vehicle"]["registration"] }}</h5>
+                    <h6 class="mb-2 text-muted">{{ appointment["date"] }}</h6>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">Owner: {{ appointment["vehicle"]["owner"]["last"] }}, {{ appointment["vehicle"]["owner"]["first"] }}</li>
@@ -47,9 +60,9 @@
                     <li class="list-group-item">Model: {{ appointment["vehicle"]["model"] }}</li>
                     <li class="list-group-item">Year: {{ appointment["vehicle"]["year"] }}</li>
                     <li class="list-group-item">Colour: {{ appointment["vehicle"]["colour"] }}</li>
-                    <li class="list-group-item">Assigned to: {{ appointment["assigned"]["last"] }}, {{ appointment["assigned"]["first"] }}</li>
+                    <li class="list-group-item">Assigned to {{ appointment["assigned"]["last"] }}, {{ appointment["assigned"]["first"] }}</li>
                 </ul>
-                <div class="card-body">        
+                <div class="panel-body">
                     <a href="#" class="card-link">Update</a>
                     <a href="/appointment/{{ appointment["id"] }}/delete/" class="card-link text-danger float-right">Delete</a>
                 </div>
@@ -57,8 +70,5 @@
         </div>
     {% endfor %}
     </div>
-</div>
-    </div>
-</div>
 </div>
 {% endblock %}
