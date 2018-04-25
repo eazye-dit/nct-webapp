@@ -2,16 +2,21 @@ from webapp import app
 from flask import render_template, send_from_directory, request, url_for, redirect, flash
 import requests as r
 
-@app.route('/')
-def index():
+def check_user():
     if 'session' in request.cookies:
         roles = call_api('whoami')["roles"]
         if "Administrator" in roles:
-            appointments = call_api("admin/appointments")
-            return render_template('admin/index.tpl', appointments=appointments)
+            return "admin"
         elif "Mechanic" in roles:
-            appointments = call_api("mechanic/appointments")
-            return render_template('mechanic/index.tpl', appointments=appointments)
+            return "mechanic"
+    return False
+
+@app.route('/')
+def index():
+    check = check_user()
+    if check:
+       appointments = call_api("{}/appointments".format(check))
+       return render_template('{}/index.tpl'.format(check), appointments=appointments)
     return render_template('login.tpl')
 
 @app.route('/login/', methods=["POST"])
@@ -39,17 +44,45 @@ def logout():
     response.set_cookie('session', expires=0)
     return response
 
+@app.route('/appointment/<id>')
+def appointment(id):
+    check = check_user()
+    if check and check == "admin":
+        appointment = call_api("{}/appointment/{}/".format(check, id))
+        return render_template("{}/appointment.tpl".format(check), appointment=appointment)
+    else:
+        flash("Unauthorized")
+        return redirect(url_for('index'))
+
+@app.route('/appointment/<id>/delete/')
+def delete_appointment(id):
+    check = check_user()
+    if check and check == "admin":
+        response = call_api("{}/appointment/{}/".format(check, id), method="delete")
+        return redirect(url_for('index'))
+    else:
+        flash("Unauthorized")
+        return redirect(url_for('index'))
+
 @app.route('/res/<path:path>')
 def send_css(path):
     a = 0
     return send_from_directory('resources', path)
 
-def call_api(url):
+def call_api(url, method="get", **kwargs):
+    if "payload" in kwargs:
+        payload = kwargs["payload"]
+    else:
+        payload = None
     url += "/"
     session = r.Session()
     if 'session' in request.cookies:
         session.cookies["session"] = request.cookies["session"]
     else:
         return False
-    resp = session.get(app.config["BASE_URL"] + url)
+    if payload:
+        resp = getattr(session, method)(app.config["BASE_URL"] + url, json=payload)
+    else:
+        resp = getattr(session, method)(app.config["BASE_URL"] + url)
     return resp.json()
+

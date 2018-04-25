@@ -1,5 +1,5 @@
 {% extends "bootstrap/base.html" %}
-{% block title %}Index{% endblock %}
+{% block title %}Appointments{% endblock %}
 
 
 
@@ -21,8 +21,7 @@
 
           <ul class="nav masthead-nav">
             <li class="active">
-              <a href="/" target=
-              "_blank">Home</a>
+              <a href="/">Appointments</a>
             </li>
 
             <li>
@@ -32,27 +31,33 @@
           </ul>
         </div>
       </div>
-	  
-	  <div class="subhead">
-	  
-	  <button align="left">Appointments</button>
-	  <button align="right">Mechanics</button>
-	  
-	  </div>
-
-      <div class="inner cover" style="border: 1px groove black"> 
-		{% for appointment in appointments["appointments"] %}
-		
-		<p> {{ appointment["assigned"]["last"], appointment["date"], appointment["vehicle"]["registration"] }} </p> 
-
-		
-		{% endfor%}
-      </div>
-	  
-	  
-	  
-	  
-	  
+    </div>
+  <div class="container">
+    <div class="row">
+    {% for appointment in appointments["appointments"] %}
+        <div class="col-sm-4" style="border: 1px solid #ddd;">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ appointment["vehicle"]["registration"] }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ appointment["date"] }}</h6>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Owner: {{ appointment["vehicle"]["owner"]["last"] }}, {{ appointment["vehicle"]["owner"]["first"] }}</li>
+                    <li class="list-group-item">Make: {{ appointment["vehicle"]["make"] }}</li>
+                    <li class="list-group-item">Model: {{ appointment["vehicle"]["model"] }}</li>
+                    <li class="list-group-item">Year: {{ appointment["vehicle"]["year"] }}</li>
+                    <li class="list-group-item">Colour: {{ appointment["vehicle"]["colour"] }}</li>
+                    <li class="list-group-item">Assigned to: {{ appointment["assigned"]["last"] }}, {{ appointment["assigned"]["first"] }}</li>
+                </ul>
+                <div class="card-body">        
+                    <a href="#" class="card-link">Update</a>
+                    <a href="/appointment/{{ appointment["id"] }}/delete/" class="card-link text-danger float-right">Delete</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
     </div>
 </div>
 </div>
