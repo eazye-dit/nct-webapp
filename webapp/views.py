@@ -15,9 +15,16 @@ def check_user():
 def index():
     check = check_user()
     if check:
-       appointments = call_api("{}/appointments".format(check))
-       return render_template('{}/index.tpl'.format(check), appointments=appointments)
+       return render_template('{}/index.tpl'.format(check))
     return render_template('login.tpl')
+
+@app.route('/appointments/')
+def appointments():
+    check = check_user()
+    if check:
+        appointments = call_api("{}/appointments".format(check))
+        return render_template('{}/appointments.tpl'.format(check), appointments=appointments)
+    return renter_template(url_for('index'))
 
 @app.route('/login/', methods=["POST"])
 def login():
@@ -44,12 +51,13 @@ def logout():
     response.set_cookie('session', expires=0)
     return response
 
-@app.route('/appointment/<id>')
+@app.route('/appointment/<id>/')
 def appointment(id):
     check = check_user()
     if check and check == "admin":
+        mechanics = call_api("{}/mechanics/".format(check))
         appointment = call_api("{}/appointment/{}/".format(check, id))
-        return render_template("{}/appointment.tpl".format(check), appointment=appointment)
+        return render_template("{}/appointment.tpl".format(check), appointment=appointment, mechanics=mechanics)
     else:
         flash("Unauthorized")
         return redirect(url_for('index'))
