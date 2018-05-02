@@ -9,26 +9,40 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+    <div class="container">
     {%- with messages = get_flashed_messages(with_categories=True) %}
-    {%- if messages %}
-        <div class="row">
-            <div class="col-md-12">
-                {{utils.flashed_messages(messages)}}
+        {%- if messages %}
+            <div class="row">
+                <div class="col-md-12">
+                    {{utils.flashed_messages(messages)}}
+                </div>
             </div>
-        </div>
-    {%- endif %}
+        {%- endif %}
     {%- endwith %}
     <div class="login-container">
             <div id="output"></div>
             <div class="avatar"></div>
             <div class="form-box">
-                <form action="/login/" method="POST">
-                    <input name="username" type="text" placeholder="username">
-                    <input type="password" placeholder="password" name="password">
-                    <button class="btn btn-info btn-block login" type="submit">Login</button>
+                <form method="POST">
+                    {% for field in form %}
+                        {% if field.type != "SubmitField" %}
+                            <div class="form-group">
+                                {{ field.label }}
+                                {{ field(class_="form-control") }}
+                                {% if field.errors %}
+                                    <ul class="errors">
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <button class="btn btn-info btn-default" type="{{ field.label.data }}">{{ form.action }}</button>
+                        {%- endif %}
+                    {%- endfor %}
                 </form>
             </div>
         </div>
-</div>
+    </div>
 {% endblock %}

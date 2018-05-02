@@ -1,4 +1,4 @@
-from webapp import app
+from webapp import app, forms
 from flask import render_template, send_from_directory, request, url_for, redirect, flash
 import requests as r
 
@@ -16,7 +16,7 @@ def index():
     check = check_user()
     if check:
        return render_template('{}/index.tpl'.format(check))
-    return render_template('login.tpl')
+    return redirect(url_for('login'))
 
 @app.route('/appointments/')
 def appointments():
@@ -26,24 +26,30 @@ def appointments():
         return render_template('{}/appointments.tpl'.format(check), appointments=appointments)
     return renter_template(url_for('index'))
 
-@app.route('/login/', methods=["POST"])
+@app.route('/login/', methods=["GET", "POST"])
 def login():
-    session = r.Session()
-    payload = {
-        "username": request.form.get("username"),
-        "password": request.form.get("password")
-    }
-
-    resp = session.post(app.config["BASE_URL"] + "login/", data=payload)
-
-    if resp.status_code == 200:
-        redir = redirect(url_for('index'))
-        response = app.make_response(redir)
-        response.set_cookie('session', value=session.cookies["session"])
-        return response
-    elif resp.status_code == 400:
-        flash("Login failed")
+    check = check_user()
+    if check:
         return redirect(url_for('index'))
+    form = forms.LoginForm()
+    if request.method == "POST" and form.validate():
+        form = forms.LoginForm(request.form)
+        session = r.Session()
+        payload = {
+            "username": form.username.data,
+            "password": form.password.data
+        }
+
+        resp = session.post(app.config["BASE_URL"] + "login/", data=payload)
+
+        if resp.status_code == 200:
+            redir = redirect(url_for('index'))
+            response = app.make_response(redir)
+            response.set_cookie('session', value=session.cookies["session"])
+            return response
+        else:
+            flash("Login failed")
+    return render_template('login.tpl', form=form)
 
 @app.route('/logout/')
 def logout():
