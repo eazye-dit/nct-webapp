@@ -8,5 +8,5 @@ setup(name='nct-webapp',
       author='cn',
       author_email='lolexplode@gmail.com',
       packages=['webapp'],
-      install_requires=['flask', 'flask-bootstrap', 'requests']
+      install_requires=['flask', 'flask-bootstrap', 'requests', 'wtforms']
 )
