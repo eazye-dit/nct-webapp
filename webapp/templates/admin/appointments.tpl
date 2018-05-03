@@ -23,8 +23,10 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New... <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Appointment</a></li>
-            <li><a href="#">Mechanc</a></li>
+            <li><a href="/new/appointment/">Appointment</a></li>
+            <li><a href="/new/mechanic/">Mechanic</a></li>
+            <li><a href="/new/vehicle/">Vehicle</a></li>
+            <li><a href="/new/owner/">Owner</a></li>
           </ul>
         </li>
       </ul>

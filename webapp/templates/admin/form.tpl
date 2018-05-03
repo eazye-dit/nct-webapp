@@ -1,5 +1,6 @@
 {% extends "bootstrap/base.html" %}
-{% block title %}Appointments{% endblock %}
+{% block title %}{{ form.action }}{% endblock %}
+{% import "bootstrap/utils.html" as utils %}
 
 {% block scripts %}
 {{ super() }}
@@ -42,7 +43,7 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li><a href="/">Home</a></li>
-        <li class="active"><a href="/appointments/">Appointments <span class="sr-only">(current)</span></a></li>
+        <li class"active"><a href="/appointments/">Appointments <span class="sr-only">(current)</span></a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New... <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -71,48 +72,52 @@
   </div><!-- /.container-fluid -->
 </nav>
 <div class="container">
+    {%- with messages = get_flashed_messages(with_categories=True) %}
+        {%- if messages %}
+            <div class="row">
+                <div class="col-md-12">
+                    {{ utils.flashed_messages(messages) }}
+                </div>
+            </div>
+        {% endif %}
+    {%- endwith %}
     <div class="row">
             <div class="panel panel-default">
                  <div class="panel-heading">
-                    <h3 class="panel-title">{{ appointment["appointment"]["vehicle"]["registration"] }}</h5>
+                    <h3 class="panel-title">{{ form.action }}</h5>
                 </div>
                 <form method="POST">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Owner: {{ appointment["appointment"]["vehicle"]["owner"]["last"] }}, {{ appointment["appointment"]["vehicle"]["owner"]["first"] }}</li>
-                    <li class="list-group-item">Make: {{ appointment["appointment"]["vehicle"]["make"] }}</li>
-                    <li class="list-group-item">Model: {{ appointment["appointment"]["vehicle"]["model"] }}</li>
-                    <li class="list-group-item">Year: {{ appointment["appointment"]["vehicle"]["year"] }}</li>
-                    <li class="list-group-item">Colour: {{ appointment["appointment"]["vehicle"]["colour"] }}</li>
-                    <li class="list-group-item">
+                    <ul class="list-group list-group-flush">
+                    {% for field in form %}
+                        <li class="list-group-item">
                         <div class="form-group">
-                            <label for="assigned">Assigned to</label>
-                            <select class="form-control" name="assigned">
-                                {% for mechanic in mechanics["mechanics"] %}
-                                    <option value="{{ mechanic["id"] }}"
-                                    {% if appointment["appointment"]["assigned"]["username"] == mechanic["username"] %}
-                                        selected
-                                    {% endif %}
-                                    >{{ mechanic["last"] }}, {{ mechanic["first"] }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="form-group">
-                            <label for="datetimepicker1">Date</label>
-                            <div class='input-group date' id='datetimepicker1'>
-                                <input type='text' class="form-control" value="{{ appointment["appointment"]["date"] }}" name="date"/>
+                        {% if field.name == "date" %}
+                            {{ field.label }}
+                            <div class="input-group date" id="datetimepicker1">
+                                {{ field(class_="form-control") }}
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
                             </div>
+                        {% elif field.type != "SubmitField" %}
+                        <div class="form-group">
+                            {{ field.label }}
+                            {{ field(class_="form-control") }}
+                            {% if field.errors %}
+                                <ul class="errors">
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
+                        {% else %}
+                            <button class="btn btn-info btn-default" type="{{ field.label.data }}">{{ form.action }}</button>
+                        {%- endif %}
+                    </div>
                     </li>
-                </ul>
-                <div class="panel-body">
-                    <button class="btn btn-info btn-default" type="update">Update</button>
-                    <a href="/appointment/{{ appointment["appointment"]["id"] }}/delete/" class="card-link text-danger float-right">Delete</a>
-                </div>
+                    {% endfor %}
+                    </ul>
                 </form>
         </div>
     </div>
