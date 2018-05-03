@@ -32,9 +32,8 @@ def login():
     check = check_user()
     if check:
         return redirect(url_for('index'))
-    form = forms.LoginForm()
+    form = forms.LoginForm(request.form)
     if request.method == "POST" and form.validate():
-        form = forms.LoginForm(request.form)
         session = r.Session()
         payload = {
             "username": form.username.data,
@@ -97,11 +96,9 @@ def new_appointment():
     mech_list = []
     for mechanic in mechanics["mechanics"]:
         mech_list.append((mechanic["id"], "{}, {}".format(mechanic["last"], mechanic["first"])))
-    form = forms.AppointmentForm()
+    form = forms.AppointmentForm(request.form)
     form.assigned.choices = mech_list
     if request.method == "POST":
-        form = forms.AppointmentForm(request.form)
-        form.assigned.choices = mech_list
         date = datetime.strptime(form.date.data, "%a, %d %b %Y %H:%M:%S")
         datestr = date.strftime("%Y-%m-%d %H:%M")
         payload = {"date": datestr, "assigned": form.assigned.data, "vehicle": form.vehicle.data}
@@ -120,22 +117,20 @@ def new_mechanic():
         flash("Unauthorized")
         return redirect(url_for('index'))
 
-    form = forms.MechanicForm()
-    if request.method == "POST":
-        form = forms.MechanicForm(request.form)
-        if form.validate():
-            payload = {
-                "username": form.username.data,
-                "password": form.password.data,
-                "f_name": form.f_name.data,
-                "l_name": form.l_name.data
-            }
-            resp = call_api("{}/new/mechanic/".format(check), method="post", payload=payload)
-            if resp["status"] != 200:
-                flash(resp["message"])
-            else:
-                flash("Mechanic successfully registered")
-                return redirect(url_for('index'))
+    form = forms.MechanicForm(request.form)
+    if request.method == "POST" and form.validate():
+        payload = {
+            "username": form.username.data,
+            "password": form.password.data,
+            "f_name": form.f_name.data,
+            "l_name": form.l_name.data
+        }
+        resp = call_api("{}/new/mechanic/".format(check), method="post", payload=payload)
+        if resp["status"] != 200:
+            flash(resp["message"])
+        else:
+            flash("Mechanic successfully registered")
+            return redirect(url_for('index'))
     return render_template('admin/form.tpl', form=form)
 
 @app.route('/new/vehicle/', methods=["GET", "POST"])
@@ -145,31 +140,29 @@ def new_vehicle():
         flash("Unauthorized")
         return redirect(url_for('index'))
 
-    form = forms.VehicleForm()
-    if request.method == "POST":
-        form = forms.VehicleForm(request.form)
-        if form.validate():
-            owner = call_api('/admin/search/?owner={}'.format(form.owner.data))
-            if owner["status"] == 200:
-                owner_id = owner["owner"]["id"]
-            else:
-                flash(resp["message"])
-                return render_template('admin/form.tpl', form=form.VehicleForm())
-            payload = {
-                "owner": owner_id,
-                "registration": form.registration.data,
-                "make": form.make.data,
-                "model": form.model.data,
-                "year": form.year.data,
-                "vin": form.vin.data,
-                "colour": form.colour.data
-            }
-            resp = call_api("/admin/new/vehicle/", method="post", payload=payload)
-            if resp["status"] != 200:
-                flash(resp["message"])
-            else:
-                flash("Vehicle successfully registered")
-                return redirect(url_for('index'))
+    form = forms.VehicleForm(request.form)
+    if request.method == "POST" and form.validate():
+        owner = call_api('/admin/search/?owner={}'.format(form.owner.data))
+        if owner["status"] == 200:
+            owner_id = owner["owner"]["id"]
+        else:
+            flash(resp["message"])
+            return render_template('admin/form.tpl', form=form.VehicleForm())
+        payload = {
+            "owner": owner_id,
+            "registration": form.registration.data,
+            "make": form.make.data,
+            "model": form.model.data,
+            "year": form.year.data,
+            "vin": form.vin.data,
+            "colour": form.colour.data
+        }
+        resp = call_api("/admin/new/vehicle/", method="post", payload=payload)
+        if resp["status"] != 200:
+            flash(resp["message"])
+        else:
+            flash("Vehicle successfully registered")
+            return redirect(url_for('index'))
     return render_template('admin/form.tpl', form=form)
 
 @app.route('/new/owner/')
@@ -179,9 +172,8 @@ def new_owner():
         flash("Unauthorized")
         return redirect(url_for('index'))
 
-    form = forms.OwnerForm()
-    if request.method == "POST":
-        form = forms.OwnerForm(request.form)
+    form = forms.OwnerForm(request.form)
+    if request.method == "POST" and form.validate():
         payload = {
             "f_name": form.f_name.data,
             "l_name": form.l_name.data,
