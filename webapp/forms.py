@@ -9,7 +9,7 @@ class LoginForm(Form):
 class AppointmentForm(Form):
     action = "Create new appointment"
     date = TextField("Date")
-    vehicle = TextField("Vehicle")
+    vehicle = TextField("Vehicle registration")
     assigned = SelectField("Mechanic")
     submit = SubmitField("Create")
 
@@ -27,7 +27,7 @@ class VehicleForm(Form):
     owner = TextField("Owner name", [validators.required()])
     make = TextField("Make", [validators.required()])
     model = TextField("Model", [validators.required()])
-    year = IntegerField("Year", [validators.required(), validators.length(max=4, min=4)])
+    year = IntegerField("Year", [validators.required()])
     colour = TextField("Colour", [validators.required()])
     submit = SubmitField("Register")
 

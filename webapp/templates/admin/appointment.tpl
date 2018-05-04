@@ -8,13 +8,13 @@
 <script type="text/javascript" src="/res/js/collapse.js"></script>
 <script type="text/javascript" src="/res/js/bootstrap-datetimepicker.min.js"></script>
 
-                        <script type="text/javascript">
-                            $(function () {
-                                $('#datetimepicker1').datetimepicker({
-                                    format: "ddd, DD MMM YYYY HH:mm:ss"
-                                });
-                            });
-                        </script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: "ddd, DD MMM YYYY HH:mm:ss"
+        });
+    });
+</script>
 
 {% endblock %}
 
@@ -71,6 +71,16 @@
   </div><!-- /.container-fluid -->
 </nav>
 <div class="container">
+    {%- with messages = get_flashed_messages(with_categories=True) %}
+        {%- if messages %}
+            <div class="row">
+                <div class="col-md-12">
+                    {{utils.flashed_messages(messages)}}
+                </div>
+            </div>
+        {%- endif %}
+    {%- endwith %}
+
     <div class="row">
             <div class="panel panel-default">
                  <div class="panel-heading">
