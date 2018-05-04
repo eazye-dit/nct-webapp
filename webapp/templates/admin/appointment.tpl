@@ -1,5 +1,6 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}Appointments{% endblock %}
+{% import "bootstrap/utils.html" as utils %}
 
 {% block scripts %}
 {{ super() }}

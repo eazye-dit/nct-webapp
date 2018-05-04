@@ -4,22 +4,13 @@ import requests as r
 from datetime import datetime
 
 def check_user():
-    if 'session' in request.cookies:
+    if 'nct_session' in request.cookies:
         roles = call_api('whoami')["roles"]
         if "Administrator" in roles:
             return "admin"
         elif "Mechanic" in roles:
             return "mechanic"
     return False
-
-def redirect_with_cookie(re):
-    if 'session' in request.cookies:
-        redir = redirect(url_for(re))
-        response = app.make_response(redir)
-        response.set_cookie('session', value=request.cookies["session"])
-        return response
-    else:
-        return redirect(url_for(redirect))
 
 @app.route('/')
 def index():
@@ -54,24 +45,23 @@ def login():
         if resp.status_code == 200:
             redir = redirect(url_for('index'))
             response = app.make_response(redir)
-            response.set_cookie('session', value=session.cookies["session"])
+            response.set_cookie('nct_session', value=session.cookies["session"])
             return response
         else:
-            pass
-            #flash("Login failed")
+            flash("Login failed")
     return render_template('login.tpl', form=form)
 
 @app.route('/logout/')
 def logout():
     response = app.make_response(redirect(url_for('index')))
-    response.set_cookie('session', expires=0)
+    response.set_cookie('nct_session', expires=0)
     return response
 
 @app.route('/appointment/<id>/', methods=["GET", "POST"])
 def appointment(id):
     check = check_user()
     if not check or not check == "admin":
-        #flash("Unauthorized")
+        flash("Unauthorized")
         return redirect(url_for('index'))
     appointment = call_api("{}/appointment/{}/".format(check, id))
     if request.method == "POST":
@@ -83,8 +73,7 @@ def appointment(id):
         payload = {"date": datestr, "assigned": assigned, "vehicle": vehicle}
         resp = call_api("{}/appointment/{}/".format(check, id), method="post", payload=payload)
         if resp["status"] != 200:
-            pass
-            #flash(resp["message"])
+            flash(resp["message"])
         return redirect(url_for('appointment', id=id))
     mechanics = call_api("{}/mechanics/".format(check))
     return render_template("{}/appointment.tpl".format(check), appointment=appointment, mechanics=mechanics)
@@ -96,14 +85,14 @@ def delete_appointment(id):
         response = call_api("{}/appointment/{}/".format(check, id), method="delete")
         return redirect(url_for('appointments'))
     else:
-        #flash("Unauthorized")
+        flash("Unauthorized")
         return redirect(url_for('index'))
 
 @app.route('/new/appointment/', methods=["GET", "POST"])
 def new_appointment():
     check = check_user()
     if not check or not check == "admin":
-        #flash("Unauthorized")
+        flash("Unauthorized")
         return redirect(url_for('index'))
     mechanics = call_api("{}/mechanics/".format(check))
     mech_list = []
@@ -117,10 +106,9 @@ def new_appointment():
         payload = {"date": datestr, "assigned": form.assigned.data, "vehicle": form.vehicle.data}
         resp = call_api("{}/new/appointment/".format(check), method="post", payload=payload)
         if resp["status"] != 200:
-            #flash(resp["message"])
-            pass
+            flash(resp["message"])
         else:
-            #flash("Appointment successfully created")
+            flash("Appointment successfully created")
             return redirect(url_for('appointment', id=resp["appointment"]["id"]))
     return render_template('admin/form.tpl', form=form)
 
@@ -128,7 +116,7 @@ def new_appointment():
 def new_mechanic():
     check = check_user()
     if not check or not check == "admin":
-        #flash("Unauthorized")
+        flash("Unauthorized")
         return redirect(url_for('index'))
 
     form = forms.MechanicForm(request.form)
@@ -141,10 +129,9 @@ def new_mechanic():
         }
         resp = call_api("{}/new/mechanic/".format(check), method="post", payload=payload)
         if resp["status"] != 200:
-            #flash(resp["message"])
-            pass
+            flash(resp["message"])
         else:
-            #flash("Mechanic successfully registered")
+            flash("Mechanic successfully registered")
             return redirect(url_for('index'))
     return render_template('admin/form.tpl', form=form)
 
@@ -152,7 +139,7 @@ def new_mechanic():
 def new_vehicle():
     check = check_user()
     if not check or not check == "admin":
-        #flash("Unauthorized")
+        flash("Unauthorized")
         return redirect(url_for('index'))
 
     form = forms.VehicleForm(request.form)
@@ -161,7 +148,7 @@ def new_vehicle():
         if owner["status"] == 200:
             owner_id = owner["owner"]["id"]
         else:
-            #flash(owner["message"])
+            flash(owner["message"])
             return render_template('admin/form.tpl', form=form)
         payload = {
             "owner": owner_id,
@@ -174,10 +161,9 @@ def new_vehicle():
         }
         resp = call_api("/admin/new/vehicle/", method="post", payload=payload)
         if resp["status"] != 200:
-            pass
-            #flash(resp["message"])
+            flash(resp["message"])
         else:
-            ##flash("Vehicle successfully registered")
+            #flash("Vehicle successfully registered")
             return redirect(url_for('index'))
     return render_template('admin/form.tpl', form=form)
 
@@ -185,7 +171,7 @@ def new_vehicle():
 def new_owner():
     check = check_user()
     if not check or not check == "admin":
-        #flash("Unauthorized")
+        flash("Unauthorized")
         return redirect(url_for('index'))
 
     form = forms.OwnerForm(request.form)
@@ -197,11 +183,10 @@ def new_owner():
         }
         resp = call_api("/admin/new/owner/", method="post", payload=payload)
         if resp["status"] != 200:
-            pass
-            #flash(resp["message"])
+            flash(resp["message"])
         else:
-            #flash("Owner successfully registered")
-            return redirect_with_cookie('index')
+            flash("Owner successfully registered")
+            return redirect(url_for('index'))
     return render_template('admin/form.tpl', form=form)
 
 @app.route('/res/<path:path>')
@@ -215,8 +200,8 @@ def call_api(url, method="get", **kwargs):
         payload = None
     url += "/"
     session = r.Session()
-    if 'session' in request.cookies:
-        session.cookies["session"] = request.cookies["session"]
+    if 'nct_session' in request.cookies:
+        session.cookies["session"] = request.cookies["nct_session"]
     else:
         return False
     if payload:
