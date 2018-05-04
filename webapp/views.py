@@ -4,7 +4,7 @@ import requests as r
 from datetime import datetime
 
 def check_user():
-    if 'session' in request.cookies:
+    if 'nct_session' in request.cookies:
         roles = call_api('whoami')["roles"]
         if "Administrator" in roles:
             return "admin"
@@ -23,9 +23,9 @@ def index():
 def appointments():
     check = check_user()
     if check and check == "admin":
-        appointments = call_api("{}/appointments".format(check))
-        return render_template('{}/appointments.tpl'.format(check), appointments=appointments)
-    return render_template(url_for('index'))
+        appointments = call_api("admin/appointments".format(check))
+        return render_template('admin/appointments.tpl'.format(check), appointments=appointments)
+    return redirect(url_for('index'))
 
 @app.route('/login/', methods=["GET", "POST"])
 def login():
@@ -45,7 +45,7 @@ def login():
         if resp.status_code == 200:
             redir = redirect(url_for('index'))
             response = app.make_response(redir)
-            response.set_cookie('session', value=session.cookies["session"])
+            response.set_cookie('nct_session', value=session.cookies["session"])
             return response
         else:
             flash("Login failed")
@@ -54,7 +54,7 @@ def login():
 @app.route('/logout/')
 def logout():
     response = app.make_response(redirect(url_for('index')))
-    response.set_cookie('session', expires=0)
+    response.set_cookie('nct_session', expires=0)
     return response
 
 @app.route('/appointment/<id>/', methods=["GET", "POST"])
@@ -72,6 +72,8 @@ def appointment(id):
         vehicle = appointment["appointment"]["vehicle"]["registration"]
         payload = {"date": datestr, "assigned": assigned, "vehicle": vehicle}
         resp = call_api("{}/appointment/{}/".format(check, id), method="post", payload=payload)
+        if resp["status"] != 200:
+            flash(resp["message"])
         return redirect(url_for('appointment', id=id))
     mechanics = call_api("{}/mechanics/".format(check))
     return render_template("{}/appointment.tpl".format(check), appointment=appointment, mechanics=mechanics)
@@ -81,7 +83,7 @@ def delete_appointment(id):
     check = check_user()
     if check and check == "admin":
         response = call_api("{}/appointment/{}/".format(check, id), method="delete")
-        return redirect(url_for('index'))
+        return redirect(url_for('appointments'))
     else:
         flash("Unauthorized")
         return redirect(url_for('index'))
@@ -146,8 +148,8 @@ def new_vehicle():
         if owner["status"] == 200:
             owner_id = owner["owner"]["id"]
         else:
-            flash(resp["message"])
-            return render_template('admin/form.tpl', form=form.VehicleForm())
+            flash(owner["message"])
+            return render_template('admin/form.tpl', form=form)
         payload = {
             "owner": owner_id,
             "registration": form.registration.data,
@@ -161,11 +163,11 @@ def new_vehicle():
         if resp["status"] != 200:
             flash(resp["message"])
         else:
-            flash("Vehicle successfully registered")
+            #flash("Vehicle successfully registered")
             return redirect(url_for('index'))
     return render_template('admin/form.tpl', form=form)
 
-@app.route('/new/owner/')
+@app.route('/new/owner/', methods=["GET", "POST"])
 def new_owner():
     check = check_user()
     if not check or not check == "admin":
@@ -198,8 +200,8 @@ def call_api(url, method="get", **kwargs):
         payload = None
     url += "/"
     session = r.Session()
-    if 'session' in request.cookies:
-        session.cookies["session"] = request.cookies["session"]
+    if 'nct_session' in request.cookies:
+        session.cookies["session"] = request.cookies["nct_session"]
     else:
         return False
     if payload:

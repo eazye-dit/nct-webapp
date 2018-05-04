@@ -1,6 +1,35 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}Appointments{% endblock %}
 
+{% block scripts %}
+{{super()}}
+
+<script src="/res/js/bootbox.min.js"></script>
+<script>
+    $(document).on("click", ".text-danger", function(e) {
+        var lHref = $(this).attr('data-href');
+        bootbox.confirm({
+            message: "Are you sure you want to delete this appointment?",
+            buttons: {
+                confirm: {
+                    label: "Yes",
+                    className: "btn-success"
+                },
+                cancel: {
+                    label: "No",
+                    className: "btn-danger"
+                }
+            },
+            callback: function(result) {
+                if (result) {
+                    window.location.href = lHref;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
@@ -66,7 +95,7 @@
                 </ul>
                 <div class="panel-body">
                     <a href="/appointment/{{ appointment["id"] }}/" class="card-link">Update</a>
-                    <a href="/appointment/{{ appointment["id"] }}/delete/" class="card-link text-danger float-right">Delete</a>
+                    <a data-href="/appointment/{{ appointment["id"] }}/delete/" class="card-link text-danger float-right">Delete</a>
                 </div>
             </div>
         </div>
