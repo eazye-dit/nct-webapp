@@ -5,7 +5,7 @@ from datetime import datetime
 
 def check_user():
     if 'nct_session' in request.cookies:
-        roles = call_api('whoami')["roles"]
+        roles = call_api('whoami/')["roles"]
         if "Administrator" in roles:
             return "admin"
         elif "Mechanic" in roles:
@@ -23,7 +23,7 @@ def index():
 def appointments():
     check = check_user()
     if check and check == "admin":
-        appointments = call_api("admin/appointments".format(check))
+        appointments = call_api("admin/appointments/".format(check))
         return render_template('admin/appointments.tpl'.format(check), appointments=appointments)
     return redirect(url_for('index'))
 
@@ -144,11 +144,12 @@ def new_vehicle():
 
     form = forms.VehicleForm(request.form)
     if request.method == "POST" and form.validate():
-        owner = call_api('/admin/search/?owner={}'.format(form.owner.data))
+        query = form.owner.data.replace(" ", "%20")
+        owner = call_api('admin/search/?owner=' + query)
         if owner["status"] == 200:
             owner_id = owner["owner"]["id"]
         else:
-            flash(owner["message"])
+            flash("Owner: " + owner["message"])
             return render_template('admin/form.tpl', form=form)
         payload = {
             "owner": owner_id,
@@ -159,7 +160,7 @@ def new_vehicle():
             "vin": form.vin.data,
             "colour": form.colour.data
         }
-        resp = call_api("/admin/new/vehicle/", method="post", payload=payload)
+        resp = call_api("admin/new/vehicle/", method="post", payload=payload)
         if resp["status"] != 200:
             flash(resp["message"])
         else:
@@ -181,7 +182,7 @@ def new_owner():
             "l_name": form.l_name.data,
             "phone": form.phone.data
         }
-        resp = call_api("/admin/new/owner/", method="post", payload=payload)
+        resp = call_api("admin/new/owner/", method="post", payload=payload)
         if resp["status"] != 200:
             flash(resp["message"])
         else:
@@ -198,7 +199,6 @@ def call_api(url, method="get", **kwargs):
         payload = kwargs["payload"]
     else:
         payload = None
-    url += "/"
     session = r.Session()
     if 'nct_session' in request.cookies:
         session.cookies["session"] = request.cookies["nct_session"]
