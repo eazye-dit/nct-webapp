@@ -8,23 +8,22 @@ def check_user():
         roles = call_api('whoami/')["roles"]
         if "Administrator" in roles:
             return "admin"
-        elif "Mechanic" in roles:
-            return "mechanic"
     return False
 
 @app.route('/')
 def index():
     check = check_user()
     if check:
-       return render_template('{}/index.tpl'.format(check))
+        appointments = call_api("admin/appointments/?completed=true")
+        return render_template('admin/index.tpl', appointments=appointments)
     return redirect(url_for('login'))
 
 @app.route('/appointments/')
 def appointments():
     check = check_user()
     if check and check == "admin":
-        appointments = call_api("admin/appointments/".format(check))
-        return render_template('admin/appointments.tpl'.format(check), appointments=appointments)
+        appointments = call_api("admin/appointments/?ahead=30")
+        return render_template('admin/appointments-list.tpl', appointments=appointments)
     return redirect(url_for('index'))
 
 @app.route('/login/', methods=["GET", "POST"])
@@ -42,7 +41,9 @@ def login():
 
         resp = session.post(app.config["BASE_URL"] + "login/", data=payload)
 
-        if resp.status_code == 200:
+        roles = session.get(app.config["BASE_URL"] + "whoami/").json()["roles"]
+
+        if resp.status_code == 200 and "Administrator" in roles:
             redir = redirect(url_for('index'))
             response = app.make_response(redir)
             response.set_cookie('nct_session', value=session.cookies["session"])
@@ -64,6 +65,8 @@ def appointment(id):
         flash("Unauthorized")
         return redirect(url_for('index'))
     appointment = call_api("{}/appointment/{}/".format(check, id))
+    if "test" in appointment:
+        return render_template("admin/result.tpl", appointment=appointment)
     if request.method == "POST":
         form = request.form
         date = datetime.strptime(form["date"], "%a, %d %b %Y %H:%M:%S")

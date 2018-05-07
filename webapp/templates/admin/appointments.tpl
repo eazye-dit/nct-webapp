@@ -105,8 +105,8 @@
                     <li class="list-group-item">Assigned to {{ appointment["assigned"]["last"] }}, {{ appointment["assigned"]["first"] }}</li>
                 </ul>
                 <div class="panel-body">
-                    <a href="/appointment/{{ appointment["id"] }}/" class="card-link">Update</a>
-                    <a data-href="/appointment/{{ appointment["id"] }}/delete/" class="card-link text-danger float-right">Delete</a>
+                    <a href="/appointment/{{ appointment["id"] }}/">Update</a>
+                    <a data-href="/appointment/{{ appointment["id"] }}/delete/" class="delete-link text-danger float-right">Delete</a>
                 </div>
             </div>
         </div>

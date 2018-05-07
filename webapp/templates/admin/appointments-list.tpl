@@ -7,6 +7,28 @@
 
 <script src="/res/js/bootbox.min.js"></script>
 <script>
+    $(document).on("click", ".text-danger", function(e) {
+        var lHref = $(this).attr('data-href');
+        bootbox.confirm({
+            message: "Are you sure you want to delete this appointment?",
+            buttons: {
+                confirm: {
+                    label: "Yes",
+                    className: "btn-success"
+                },
+                cancel: {
+                    label: "No",
+                    className: "btn-danger"
+                }
+            },
+            callback: function(result) {
+                if (result) {
+                    window.location.href = lHref;
+                }
+            }
+        });
+    });
+
     $(document).ready(function($) {
         $(".clickable-row").click(function() {
             window.location = $(this).data("href");
@@ -37,8 +59,8 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
-        <li><a href="/appointments/">Appointments</a></li>
+        <li><a href="/">Home</a></li>
+        <li class="active"><a href="#">Appointments <span class="sr-only">(current)</span></a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New... <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -76,23 +98,22 @@
             </div>
         {%- endif %}
     {%- endwith %}
+
     <div class="row">
-        <h2>Recently completed appointments</h2>
-        <table class="table table-striped table-hover">
+        <h2>Untested vehicles</h2>
+        <table class="table table-hover table-striped">
             <tr>
                 <th>Vehicle registration</th>
                 <th>Appointment date</th>
-                <th>Test complete</th>
-                <th>Assigned to</th>
+                <th>Assigned</th>
             </tr>
-       {% for appointment in appointments["appointments"] %}
+        {% for appointment in appointments["appointments"] %}
             <tr class="clickable-row" data-href="/appointment/{{ appointment["id"] }}/">
                 <td>{{ appointment["vehicle"]["registration"] }}</td>
                 <td>{{ appointment["date"] }}</td>
-                <td>{{ appointment["completed"] }}</td>
                 <td>{{ appointment["assigned"]["last"] }}, {{ appointment["assigned"]["first"] }}</td>
             </tr>
-       {% endfor %}
+        {% endfor %}
         </table>
     </div>
 </div>

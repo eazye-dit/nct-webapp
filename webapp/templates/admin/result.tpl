@@ -2,22 +2,10 @@
 {% block title %}Appointments{% endblock %}
 {% import "bootstrap/utils.html" as utils %}
 
-{% block scripts %}
-{{super()}}
-
-<script src="/res/js/bootbox.min.js"></script>
-<script>
-    $(document).ready(function($) {
-        $(".clickable-row").click(function() {
-            window.location = $(this).data("href");
-        });
-    });
-</script>
-{% endblock %}
-
 {% block styles %}
 {{ super() }}
 <link rel="stylesheet" href="/res/css/utils.css">
+
 {% endblock %}
 
 {% block content %}
@@ -37,8 +25,8 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
-        <li><a href="/appointments/">Appointments</a></li>
+        <li><a href="/">Home</a></li>
+        <li class="active"><a href="/appointments/">Appointments <span class="sr-only">(current)</span></a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">New... <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -76,24 +64,46 @@
             </div>
         {%- endif %}
     {%- endwith %}
+
     <div class="row">
-        <h2>Recently completed appointments</h2>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ appointment["appointment"]["vehicle"]["registration"] }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Owner: {{ appointment["appointment"]["vehicle"]["owner"]["last"] }}, {{ appointment["appointment"]["vehicle"]["owner"]["first"] }}</li>
+                <li class="list-group-item">Make: {{ appointment["appointment"]["vehicle"]["make"] }}</li>
+                <li class="list-group-item">Model: {{ appointment["appointment"]["vehicle"]["model"] }}</li>
+                <li class="list-group-item">Year: {{ appointment["appointment"]["vehicle"]["year"] }}</li>
+                <li class="list-group-item">Colour: {{ appointment["appointment"]["vehicle"]["colour"] }}</li>
+                <li class="list-group-item">Appointment date: {{ appointment["appointment"]["date"] }}</li>
+                <li class="list-group-item">Test completed: {{ appointment["appointment"]["completed"] }}</li>
+                <li class="list-group-item">Test performed by: {{ appointment["appointment"]["assigned"]["last"] }}, {{ appointment["appointment"]["assigned"]["first"] }}</li>
+            </ul>
+        </div>
         <table class="table table-striped table-hover">
             <tr>
-                <th>Vehicle registration</th>
-                <th>Appointment date</th>
-                <th>Test complete</th>
-                <th>Assigned to</th>
+                <th>Test step</th>
+                <th>Points of failure</th>
+                <th>Comment</th>
             </tr>
-       {% for appointment in appointments["appointments"] %}
-            <tr class="clickable-row" data-href="/appointment/{{ appointment["id"] }}/">
-                <td>{{ appointment["vehicle"]["registration"] }}</td>
-                <td>{{ appointment["date"] }}</td>
-                <td>{{ appointment["completed"] }}</td>
-                <td>{{ appointment["assigned"]["last"] }}, {{ appointment["assigned"]["first"] }}</td>
+        {% for result in appointment["test"]["results"] %}
+            <tr>
+                <td>{{ result["step"]["id"] }} - {{ result["step"]["name"] }}</td>
+            {% if result["failures"]| length > 0 %}
+                <td>
+                {% for failure in result["failures"] %}
+                <b>{{ failure["item"] }}</b>: {{ failure["name"] }}<br />
+                {% endfor %}
+                </td>
+            {% else %}
+                <td>No failures</td>
+            {% endif %}
+                {% if result["comment"] %}<td>{{ result["comment"] }}</td>{% else %}<td>No comment</td>{% endif %}
             </tr>
-       {% endfor %}
+        {% endfor %}
         </table>
     </div>
 </div>
+
 {% endblock %}
