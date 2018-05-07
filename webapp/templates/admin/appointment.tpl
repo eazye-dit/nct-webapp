@@ -17,11 +17,37 @@
     });
 </script>
 
+<script src="/res/js/bootbox.min.js"></script>
+<script>
+    $(document).on("click", ".delete-link", function(e) {
+        var lHref = $(this).attr('data-href');
+        bootbox.confirm({
+            message: "Are you sure you want to delete this appointment?",
+            buttons: {
+                confirm: {
+                    label: "Yes",
+                    className: "btn-success"
+                },
+                cancel: {
+                    label: "No",
+                    className: "btn-danger"
+                }
+            },
+            callback: function(result) {
+                if (result) {
+                    window.location.href = lHref;
+                }
+            }
+        });
+    });
+</script>
+
 {% endblock %}
 
 {% block styles %}
 {{ super() }}
 <link href="/res/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/res/css/utils.css">
 
 {% endblock %}
 
@@ -122,7 +148,7 @@
                 </ul>
                 <div class="panel-body">
                     <button class="btn btn-info btn-default" type="update">Update</button>
-                    <a href="/appointment/{{ appointment["appointment"]["id"] }}/delete/" class="card-link text-danger float-right">Delete</a>
+                    <a data-href="/appointment/{{ appointment["appointment"]["id"] }}/delete/" class="delete-link text-danger float-right">Delete</a>
                 </div>
                 </form>
         </div>
