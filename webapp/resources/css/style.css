@@ -1,3 +1,7 @@
+body {
+    background: #FFC300;
+}
+
 .login-container{
     position: relative;
     width: 300px;
@@ -5,7 +9,7 @@
     padding: 20px 40px 40px;
     text-align: center;
     background: #fff;
-    border: 1px solid #ccc;
+    border: 1px solid #000;
 }
 
 .form-box input{
@@ -47,7 +51,7 @@
 }
 
 .btn-info {
-    background-color: #fecc00;
+    background-color: #fecd00;
     color: #000;
     text-shadow: 0 0px 0px rgba(0,0,0,0);
 }

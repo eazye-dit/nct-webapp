@@ -22,6 +22,7 @@
 {% block styles %}
 {{ super() }}
 <link href="/res/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/res/css/utils.css">
 
 {% endblock %}
 
@@ -36,7 +37,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">NCT</a>
+      <a class="logo" href="/"><img src="/res/img/logosmall.png" /></a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
