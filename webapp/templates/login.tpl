@@ -19,9 +19,10 @@
             </div>
         {%- endif %}
     {%- endwith %}
+
     <div class="login-container">
             <div id="output"></div>
-            <div class="avatar"></div>
+            <div class="avatar"><img src="/res/img/logo.png" /></div>
             <div class="form-box">
                 <form method="POST">
                     {% for field in form %}

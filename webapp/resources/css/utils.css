@@ -2,3 +2,12 @@ tr.clickable-row, a.delete-link {
     cursor: pointer;
 }
 
+.navbar-inverse, .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav > li > a {
+    background-color: #FFC300;
+    color: #000;
+}
+
+
+.logo {
+    padding-right: 10px;
+}
